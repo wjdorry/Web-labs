@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.min.css?_v=20230917120620">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#0f1720; --card:#1F2732; --text:#E5EAEE; --muted:#AEB7C2; --accent:#D1B06B; }
+        body { background: var(--bg); }
+        .page { margin-top: 250px; }
+        @media (max-width: 768px){ .page { margin-top: 80px; } }
+        @media (max-width: 480px){ .page { margin-top: 64px; } }
+        .cart-layout { display: grid; gap: 24px; }
+        .cart-grid { display: grid; gap: 18px; }
+        .cart-item { display: grid; grid-template-columns: 140px 1fr; gap: 18px; background: var(--card); border: 1px solid rgba(209,176,107,0.18); border-radius: 16px; overflow: hidden; padding: 16px; align-items: center; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+        .cart-item:hover { transform: translateY(-4px); box-shadow: 0 12px 26px rgba(0,0,0,0.35); border-color: rgba(209,176,107,0.35); }
+        .cart-item__banner { width: 100%; height: 120px; background: #0b121a; border-radius: 12px; overflow: hidden; }
+        .cart-item__banner img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+        .cart-item:hover .cart-item__banner img { transform: scale(1.05); }
+        .cart-item__body { display: grid; gap: 10px; }
+        .cart-item__title { font-size: 20px; font-weight: 600; color: var(--text); }
+        .cart-item__meta { display: flex; flex-wrap: wrap; gap: 8px; }
+        .cart-chip { font-size: 12px; color: var(--text); border: 1px solid rgba(209,176,107,0.35); padding: 6px 12px; border-radius: 999px; background: rgba(31,39,50,0.6); }
+        .cart-item__footer { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+        .cart-item__price { display: grid; gap: 6px; }
+        .cart-item__price span { font-size: 16px; color: var(--muted); }
+        .cart-item__price strong { font-size: 18px; font-weight: 600; color: var(--accent); }
+        .cart-qty { display: inline-flex; align-items: center; border: 1px solid rgba(209,176,107,0.35); border-radius: 999px; overflow: hidden; }
+        .cart-qty button { background: transparent; border: none; color: var(--text); width: 40px; height: 40px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: background-color .2s ease, color .2s ease; }
+        .cart-qty button:hover { background: rgba(209,176,107,0.18); color: var(--accent); }
+        .cart-qty input { width: 60px; height: 40px; border: none; background: rgba(31,39,50,0.9); color: var(--text); text-align: center; font-size: 16px; }
+        .cart-item__actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .cart-btn { font-size: 13px; color: var(--text); background: transparent; border: 1px solid rgba(209,176,107,0.45); padding: 9px 16px; border-radius: 999px; cursor: pointer; transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .2s ease; }
+        .cart-btn:hover { background: rgba(209,176,107,0.85); color: #1F2732; border-color: var(--accent); transform: translateY(-1px); }
+        .cart-summary { background: var(--card); border: 1px solid rgba(209,176,107,0.18); border-radius: 16px; padding: 22px; display: grid; gap: 16px; position: sticky; top: 120px; }
+        .cart-summary__title { font-size: 20px; font-weight: 600; color: var(--text); }
+        .cart-summary__line { display: flex; justify-content: space-between; align-items: center; color: var(--muted); }
+        .cart-summary__total { font-size: 22px; font-weight: 700; color: var(--accent); }
+        .cart-summary__btn { font-size: 15px; padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer; background: var(--accent); color: #1F2732; font-weight: 600; transition: background-color .2s ease, transform .2s ease; }
+        .cart-summary__btn:hover { background: rgba(209,176,107,0.85); transform: translateY(-1px); }
+        .cart-summary__btn:disabled { opacity: .6; cursor: default; transform: none; }
+        .cart-empty { color: var(--muted); font-size: 16px; padding: 20px 0; display: none; }
+        .cart-status { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+        .cart-error { background: rgba(184,64,64,0.18); border: 1px solid rgba(184,64,64,0.35); color: #ffb6b6; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: none; }
+        .cart-toast { position: fixed; inset-inline-end: 32px; inset-block-end: 32px; background: rgba(31,39,50,0.95); color: var(--text); border: 1px solid rgba(209,176,107,0.4); padding: 14px 18px; border-radius: 10px; box-shadow: 0 18px 30px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transform: translateY(12px); transition: opacity .3s ease, transform .3s ease; max-width: 320px; }
+        .cart-toast.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .menu__list .menu__link[href="cart.html"] { color: var(--accent); }
+        @media (max-width: 920px) {
+            .cart-layout { grid-template-columns: 1fr; }
+            .cart-summary { position: static; }
+        }
+        @media (max-width: 640px) {
+            .cart-item { grid-template-columns: 1fr; }
+            .cart-item__banner { width: 100%; height: 180px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <header class="header">
+        <div class="header__container">
+            <div class="heder">
+                <a href="index.html" class="header__logo"><img src="img/logo.svg" alt="logo"></a>
+                <a class="buts" href="index.html">Book A Consultation</a>
+            </div>
+            <div class="foote">
+                <div class="header__menu menu">
+                    <nav class="menu__body">
+                        <ul class="menu__list">
+                            <li class="menu__item"><a href="index.html" class="menu__link">Home</a></li>
+                            <li class="menu__item"><a href="index.html" class="menu__link">About Us</a></li>
+                            <li class="menu__item"><a href="index.html" class="menu__link">Pages</a></li>
+                            <li class="menu__item"><a href="index.html" class="menu__link">Contact Us</a></li>
+                            <li class="menu__item"><a href="catalog.html" class="menu__link">Catalog</a></li>
+                            <li class="menu__item"><a href="favorites.html" class="menu__link">Favorites</a></li>
+                            <li class="menu__item"><a href="cart.html" class="menu__link">Cart</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="inform-heder">
+                    <div class="call">
+                        <div class="call-img">
+                            <a href="tel:911-987654321"><img src="img/block1/call.svg" alt="">
+                            </a>
+                        </div>
+                        <div class="ff">
+                            <div class="call-text1">
+                                <span>Call Us On:</span>
+                            </div>
+                            <div class="call-text2">
+                                <span>911-987654321</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="email">
+                        <div class="email-img">
+                            <a href="mailto:yourmail@mail.com"><img src="img/block1/email.svg" alt="">
+                            </a>
+                        </div>
+                        <div class="ff">
+                            <div class="email-text1">
+                                <span>Email Us On:</span>
+                            </div>
+                            <div class="email-text2">
+                                <span>yourmail@mail.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="page">
+        <div class="block3">
+            <div class="block3__container">
+                <div class="block3__left">
+                    <div class="block3__left-titl">
+                        <h2>Shopping Cart</h2>
+                    </div>
+                    <div class="block3__left-decor">
+                        <img src="img/block1/decor.svg" alt="decor">
+                    </div>
+                </div>
+                <div class="block3__right">
+                    <p>Review every service you intend to retain and adjust quantities before checkout.</p>
+                </div>
+            </div>
+        </div>
+        <div class="block4">
+            <div class="block4__container cart-layout">
+                <section>
+                    <div id="cart-status" class="cart-status">Loading cart...</div>
+                    <div id="cart-error" class="cart-error" role="alert"></div>
+                    <div id="cart-empty" class="cart-empty">Your cart is empty. Browse the catalog to add services.</div>
+                    <div id="cart-root" class="cart-grid" aria-live="polite"></div>
+                </section>
+                <aside class="cart-summary">
+                    <div class="cart-summary__title">Summary</div>
+                    <div class="cart-summary__line"><span>Items</span><strong id="cart-count">0</strong></div>
+                    <div class="cart-summary__line"><span>Subtotal</span><strong id="cart-total" class="cart-summary__total">0</strong></div>
+                    <button id="cart-checkout" class="cart-summary__btn" type="button" disabled>Complete purchase</button>
+                    <a class="cart-btn" href="catalog.html">Continue shopping</a>
+                </aside>
+            </div>
+        </div>
+    </main>
+</div>
+<footer class="footer">
+    <div class="footer__container">
+        <div class="footer-img">
+            <picture><source srcset="img/footer/logfoot.webp" type="image/webp"><img src="img/footer/logfoot.png" alt="img"></picture>
+        </div>
+        <div class="footer-body">
+            <div class="footer-body__col1">
+                <div class="footer-col1__titl">
+                    <p>Quick Link</p>
+                </div>
+                <div class="footer-col1__nav">
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="index.html">Home</a></li>
+                        <li class="foot-item"><a href="index.html">About Us</a></li>
+                        <li class="foot-item"><a href="index.html">Pricing</a></li>
+                        <li class="foot-item"><a href="index.html">Testimonial</a></li>
+                        <li class="foot-item"><a href="index.html">Contact Us</a></li>
+                    </ul>
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="index.html">Blog</a></li>
+                        <li class="foot-item"><a href="index.html">Blog Single</a></li>
+                        <li class="foot-item"><a href="index.html">Cases</a></li>
+                        <li class="foot-item"><a href="index.html">Cases Single</a></li>
+                        <li class="foot-item"><a href="index.html">Practice Areas</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-body__col1">
+                <div class="footer-col1__titl">
+                    <p>Utility Pages</p>
+                </div>
+                <div class="footer-col1__nav">
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="index.html">Style guide</a></li>
+                        <li class="foot-item"><a href="index.html">Licenses</a></li>
+                        <li class="foot-item"><a href="index.html">Protected</a></li>
+                        <li class="foot-item"><a href="index.html">Changelog</a></li>
+                        <li class="foot-item"><a href="index.html">Error Page</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-body__col1">
+                <div class="footer-col1__titl">
+                    <p>Practice Area</p>
+                </div>
+                <div class="footer-col1__nav">
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="index.html">Business Law</a></li>
+                        <li class="foot-item"><a href="index.html">Construction Law</a></li>
+                        <li class="foot-item"><a href="index.html">Car Accident</a></li>
+                        <li class="foot-item"><a href="index.html">Criminal Law</a></li>
+                        <li class="foot-item"><a href="index.html">Family Law</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-body__col1">
+                <div class="footer-col1__titl">
+                    <p>Contact Us</p>
+                </div>
+                <div class="footer-col1__nav">
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="#">Attorney Law Office, 121 King Street,</a></li>
+                        <li class="foot-item"><a href="#">Las Vegas 90027,USA.</a></li>
+                        <li class="foot-item"><a href="#"></a></li>
+                        <li class="foot-item"><a href="#">Phone: (011) 9876 54321</a></li>
+                        <li class="foot-item"><a href="#">Email: info@example.com</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-foot">
+            <div class="footer-foot__text">
+                <p>
+                                        Copyright (c) Attorney Law | Designed by
+                    <span>VictorFlow</span>
+                    - Powered by
+                    <span>Webflow.</span>
+                </p>
+            </div>
+            <div class="footer-foot__icon">
+                <div class="footer-icon__text"><p>Follow :</p></div>
+                <div class="footer-icon">
+                    <img src="img/footer/fb.svg" alt="img">
+                    <img src="img/footer/tw.svg" alt="img">
+                    <img src="img/footer/in.svg" alt="img">
+                    <img src="img/footer/p.svg" alt="img">
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<div id="cart-toast" class="cart-toast" role="status" aria-live="polite"></div>
+<script type="module" src="js/cart.js"></script>
+</body>
+</html>
+
+
