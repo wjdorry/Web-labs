@@ -1,0 +1,450 @@
+/**
+ * Theme Switcher Styles
+ * Light and Dark theme definitions
+ */
+
+/* Theme Switcher Controls */
+.theme-switcher {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Fixed position theme switcher (old style) - keep for backwards compatibility */
+.theme-switcher--fixed {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    z-index: 1000;
+    flex-direction: column;
+}
+
+/* Theme switcher in header */
+.theme-switcher--header {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.theme-toggle,
+.theme-reset {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(209, 176, 107, 0.5);
+    background: rgba(31, 39, 50, 0.9);
+    color: #D1B06B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+}
+
+.theme-switcher--fixed .theme-toggle,
+.theme-switcher--fixed .theme-reset {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+}
+
+.theme-toggle:hover,
+.theme-reset:hover {
+    background: rgba(209, 176, 107, 0.2);
+    border-color: #D1B06B;
+    transform: scale(1.1);
+}
+
+.theme-toggle:active,
+.theme-reset:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle__icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.theme-switcher--fixed .theme-toggle__icon {
+    font-size: 24px;
+}
+
+.theme-reset__icon {
+    font-size: 16px;
+    line-height: 1;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.theme-switcher--fixed .theme-reset__icon {
+    font-size: 20px;
+}
+
+.theme-reset:hover .theme-reset__icon {
+    transform: rotate(180deg);
+}
+
+/* Dark Theme (Default) */
+:root,
+.theme-dark {
+    /* Dark theme colors */
+    --bg-primary: #161D27;
+    --bg-secondary: #1F2732;
+    --bg-tertiary: #3B434E;
+    --text-primary: #D7D7D7;
+    --text-secondary: #FFF;
+    --text-accent: #D1B06B;
+    --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Apply dark theme by default if no theme class is set */
+html:not(.theme-light) {
+    --bg-primary: #161D27;
+    --bg-secondary: #1F2732;
+    --bg-tertiary: #3B434E;
+    --text-primary: #D7D7D7;
+    --text-secondary: #FFF;
+    --text-accent: #D1B06B;
+    --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Light Theme */
+.theme-light {
+    /* Light theme colors */
+    --bg-primary: #F5F5F5;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #E8E8E8;
+    --text-primary: #1F2732;
+    --text-secondary: #161D27;
+    --text-accent: #B8945F;
+    --border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Apply theme colors to body and main elements */
+body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Override body background from style.css */
+body {
+    background: var(--bg-primary) !important;
+}
+
+/* Header styles */
+.theme-light .header {
+    background-color: rgba(245, 245, 245, 0.95);
+}
+
+.theme-light .heder {
+    border-bottom-color: var(--border-color);
+}
+
+.theme-light .foote {
+    border-bottom-color: var(--border-color);
+}
+
+.theme-light .header__settings {
+    border-bottom: none;
+}
+
+.theme-light .menu__link {
+    color: var(--text-secondary);
+}
+
+.theme-light .menu__item:hover {
+    color: var(--text-accent);
+}
+
+.theme-light .call-text1,
+.theme-light .email-text1 {
+    color: var(--text-accent);
+}
+
+.theme-light .call-text2,
+.theme-light .email-text2 {
+    color: var(--text-secondary);
+}
+
+/* Buttons */
+.theme-light .buts {
+    border-color: var(--border-color);
+    background: rgba(232, 232, 232, 0.5);
+    color: var(--text-secondary);
+}
+
+.theme-light .buts:hover {
+    background: rgba(232, 232, 232, 0.8);
+    color: var(--text-accent);
+}
+
+.theme-light .button {
+    border-color: var(--text-accent);
+    background: var(--text-accent);
+    color: var(--bg-secondary);
+}
+
+.theme-light .button:hover {
+    background: var(--text-accent);
+    color: var(--bg-secondary);
+    opacity: 0.9;
+}
+
+/* Block styles */
+.theme-light .block1__body-titl {
+    color: var(--text-secondary);
+}
+
+.theme-light .block1__body-text {
+    color: var(--text-accent);
+}
+
+.theme-light .block2__body-titl,
+.theme-light .block2__men-names {
+    color: var(--text-secondary);
+}
+
+.theme-light .block2__info1 {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.theme-light .block2__info2 {
+    background: var(--text-accent);
+    color: var(--bg-secondary);
+}
+
+.theme-light .block2__info2-numbers {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+.theme-light .block3__left-titl {
+    color: var(--text-secondary);
+}
+
+/* Block 4 */
+.theme-light .block4__item {
+    background: var(--bg-secondary);
+}
+
+.theme-light .block4__item-titl {
+    color: var(--text-secondary);
+}
+
+.theme-light .block4__item-text {
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .block4-btn {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.theme-light .block4-btn:hover {
+    color: var(--text-accent);
+}
+
+/* Block 5 - already has white background, adjust text */
+.theme-light .block5 {
+    background-color: var(--bg-primary);
+}
+
+.theme-light .block5__titl {
+    color: var(--text-secondary);
+}
+
+.theme-light .block5__text {
+    color: var(--text-primary);
+}
+
+.theme-light .block5__item {
+    background-color: var(--bg-secondary);
+}
+
+.theme-light .it-titl {
+    color: var(--text-secondary);
+}
+
+.theme-light .it-text {
+    color: var(--text-primary);
+}
+
+/* Block 6 */
+.theme-light .block6 {
+    background-color: var(--bg-primary);
+}
+
+.theme-light .block6-titl {
+    color: var(--text-secondary);
+}
+
+/* Block 7 */
+.theme-light .block7__container {
+    background-color: rgba(245, 245, 245, 0.85);
+}
+
+.theme-light .block7-left__titl {
+    color: var(--text-secondary);
+}
+
+.theme-light .block7-text__1 {
+    color: var(--text-accent);
+}
+
+.theme-light .block7-text__2 {
+    color: var(--text-primary);
+}
+
+.theme-light .block7-right__text {
+    color: var(--text-primary);
+}
+
+.theme-light .block7-percent__text {
+    color: var(--text-primary);
+}
+
+.theme-light .block7-percent__text p:first-child {
+    color: var(--text-secondary);
+}
+
+/* Footer */
+.theme-light .footer-col1__titl {
+    color: var(--text-secondary);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .footer-foot {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .footer-foot__text span {
+    color: var(--text-accent);
+}
+
+.theme-light .footer-icon__text {
+    color: var(--text-accent);
+}
+
+.theme-light .foot-item:hover {
+    color: var(--text-accent);
+}
+
+/* Ensure interactive elements remain visible and functional */
+.theme-light .menu__item:hover .menu__link {
+    color: var(--text-accent);
+}
+
+.theme-light .buts:hover,
+.theme-light .button:hover,
+.theme-light .block4-btn:hover {
+    color: var(--text-accent);
+    opacity: 1;
+}
+
+.theme-light .button:hover {
+    background: var(--text-accent);
+    color: var(--bg-secondary);
+}
+
+.theme-light .block4-btn:hover {
+    background: var(--bg-primary);
+    color: var(--text-accent);
+}
+
+/* Ensure dark theme buttons remain visible on hover */
+.theme-dark .buts:hover,
+.theme-dark .button:hover,
+.theme-dark .block4-btn:hover {
+    color: #D1B06B;
+    opacity: 1;
+}
+
+.theme-dark .button:hover {
+    background: #D1B06B;
+    color: #1F2732;
+}
+
+.theme-dark .block4-btn:hover {
+    background: #161D27;
+    color: #D1B06B;
+}
+
+/* Ensure all links remain visible */
+.theme-light a,
+.theme-dark a {
+    color: inherit;
+}
+
+.theme-light .menu__link,
+.theme-dark .menu__link {
+    color: inherit;
+}
+
+.theme-light .foot-item,
+.theme-dark .foot-item {
+    color: inherit;
+}
+
+/* Theme switcher buttons in light theme */
+.theme-light .theme-toggle,
+.theme-light .theme-reset {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(184, 148, 95, 0.5);
+    color: var(--text-accent);
+}
+
+.theme-light .theme-toggle:hover,
+.theme-light .theme-reset:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--text-accent);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .theme-switcher--fixed {
+        top: 80px;
+        right: 10px;
+    }
+
+    .theme-switcher--fixed .theme-toggle,
+    .theme-switcher--fixed .theme-reset {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .theme-switcher--fixed .theme-toggle__icon {
+        font-size: 20px;
+    }
+
+    .theme-switcher--header .theme-toggle,
+    .theme-switcher--header .theme-reset {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .theme-switcher--header .theme-toggle__icon {
+        font-size: 18px;
+    }
+
+    .theme-switcher--header .theme-reset__icon {
+        font-size: 16px;
+    }
+}
+
+/* Smooth transitions */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Ensure buttons and links remain interactive */
+a, button, .button, .buts, .block4-btn {
+    transition: all 0.3s ease !important;
+}
+
