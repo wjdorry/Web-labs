@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Catalog</title>
+	<meta charset="UTF-8">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="icon" type="image/svg+xml" href="favicon.svg">
+	<link rel="stylesheet" href="css/style.min.css?_v=20230917120620">
+	<link rel="stylesheet" href="css/preloader.css">
+	<link rel="stylesheet" href="css/modal.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit&display=swap" rel="stylesheet">
+	<style>
+		/* Page-scoped styles for catalog grid */
+		:root { --bg:#0f1720; --card:#1F2732; --text:#E5EAEE; --muted:#AEB7C2; --accent:#D1B06B; }
+		body { background: var(--bg); }
+        /* Layout spacing to avoid header overlap */
+        .page { margin-top: 250px; }
+        @media (max-width: 768px){ .page { margin-top: 80px; } }
+        @media (max-width: 480px){ .page { margin-top: 64px; } }
+        /* Dedicated catalog styles (no reuse of existing card styles) */
+        .c-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+        .c-card { box-sizing: border-box; width: 100%; background: var(--card); border: 1px solid rgba(209,176,107,0.18); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; will-change: transform; }
+        .c-card:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(0,0,0,.35); border-color: rgba(209,176,107,0.35); }
+        .c-card__banner { width: 100%; height: 180px; background: #0b121a; overflow: hidden; }
+        .c-card__banner img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+        .c-card:hover .c-card__banner img { transform: scale(1.06); }
+        .c-card__body { padding: 18px 18px 12px; display: grid; gap: 8px; }
+        .c-card__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+        .c-chip { font-size: 12px; line-height: 1; color: var(--text); border: 1px solid rgba(209,176,107,0.45); padding: 6px 8px; border-radius: 999px; background: rgba(31,39,50,0.6); }
+        .c-chip--muted { opacity: .7; }
+        .c-card__title { color: var(--text); font-size: 18px; line-height: 1.35; font-weight: 600; }
+        .c-card__desc { color: var(--muted); font-size: 14px; line-height: 1.6; min-height: 44px; }
+        .c-card__footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px 18px; border-top: 1px solid rgba(209,176,107,0.18); gap: 12px; flex-wrap: wrap; }
+        .c-card__thumb { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex: 0 0 auto; }
+        .c-card__price { display: inline-flex; align-items: baseline; gap: 6px; border: 1px solid var(--accent); background: rgba(209,176,107,0.08); color: var(--accent); padding: 8px 12px; border-radius: 8px; font-weight: 600; letter-spacing: .02em; }
+        .c-card__price span { color: var(--text); font-weight: 700; font-size: 16px; }
+        .c-card__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .c-card__button { font-size: 13px; color: var(--text); background: transparent; border: 1px solid rgba(209,176,107,0.45); padding: 8px 12px; border-radius: 999px; cursor: pointer; transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .2s ease; }
+        .c-card__button:hover { background: var(--accent); color: #1F2732; border-color: var(--accent); transform: translateY(-1px); }
+        .c-card__button:disabled { opacity: .5; cursor: default; transform: none; }
+        /* Controls */
+        .c-controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 16px; }
+        .c-ctrl__btn { font-size: 14px; color: var(--text); background: transparent; border: 1px solid rgba(209,176,107,0.45); padding: 8px 12px; border-radius: 999px; cursor: pointer; transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
+        .c-ctrl__btn:hover { background: rgba(209,176,107,0.2); border-color: var(--accent); }
+        .c-ctrl__btn--accent { background: var(--accent); color: #1F2732; border-color: var(--accent); }
+        .c-ctrl__btn--accent:hover { background: rgba(209,176,107,0.85); }
+        .c-ctrl__btn.is-active { background: var(--accent); color: #1F2732; border-color: var(--accent); }
+        /* Search */
+        .c-search { margin: 6px 0 12px; }
+        .c-input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(209,176,107,0.35); background: #121a23; color: var(--text); }
+        /* Sort */
+        .c-sort { margin: 0 0 12px; }
+        .c-select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(209,176,107,0.35); background: #121a23; color: var(--text); }
+        .c-status { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+        .c-advanced { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 0 0 16px; }
+        .c-field { display: flex; flex-direction: column; gap: 6px; }
+        .c-field label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(229,234,238,0.7); }
+        .c-field input, .c-field select { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(209,176,107,0.35); background: #121a23; color: var(--text); font-size: 14px; }
+        .c-advanced__footer { display: flex; gap: 10px; flex-wrap: wrap; }
+        /* Categories */
+        .c-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+        .c-cat { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(209,176,107,0.35); cursor: pointer; background: rgba(31,39,50,0.5); color: var(--text); }
+        .c-cat input { accent-color: var(--accent); }
+        /* Empty state */
+        .c-empty { color: var(--muted); font-size: 16px; padding: 16px 0; display: none; }
+        .c-pagination { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 24px 0 0; }
+        .c-pagination button { background: transparent; color: var(--text); border: 1px solid rgba(209,176,107,0.35); padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
+        .c-pagination button:hover { background: rgba(209,176,107,0.2); border-color: var(--accent); }
+        .c-pagination button[disabled] { opacity: .5; cursor: default; background: rgba(31,39,50,0.6); }
+        .c-pagination .is-active { background: var(--accent); color: #1F2732; border-color: var(--accent); }
+        .c-toast { position: fixed; inset-inline-end: 32px; inset-block-end: 32px; background: rgba(31,39,50,0.95); color: var(--text); border: 1px solid rgba(209,176,107,0.4); padding: 14px 18px; border-radius: 10px; box-shadow: 0 18px 30px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transform: translateY(12px); transition: opacity .3s ease, transform .3s ease; max-width: 320px; }
+        .c-toast.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .c-error { background: rgba(184,64,64,0.18); border: 1px solid rgba(184,64,64,0.35); color: #ffb6b6; border-radius: 8px; padding: 12px 16px; margin: 12px 0; display: none; }
+
+        .catalog-modal { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 28px; align-items: start; }
+        .catalog-modal__media { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid rgba(209,176,107,0.18); background: rgba(15,23,32,0.8); min-height: 240px; }
+        .catalog-modal__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .catalog-modal__badge { position: absolute; inset: 18px auto auto 18px; background: rgba(15,23,32,0.75); border-radius: 999px; border: 1px solid rgba(209,176,107,0.38); color: var(--accent); padding: 6px 12px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+        .catalog-modal__content { display: grid; gap: 20px; }
+        .catalog-modal__header { display: grid; gap: 10px; }
+        .catalog-modal__title { margin: 0; font-size: 1.9rem; font-weight: 600; color: var(--text); }
+        .catalog-modal__chips { display: flex; flex-wrap: wrap; gap: 10px; }
+        .catalog-modal__section { display: grid; gap: 8px; color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
+        .catalog-modal__section strong { color: var(--text); font-size: 1rem; letter-spacing: 0.04em; text-transform: uppercase; }
+        .catalog-modal__details { display: grid; gap: 10px; }
+        .catalog-modal__details p { margin: 0; color: var(--text); line-height: 1.6; }
+        .catalog-modal__price { display: inline-flex; align-items: baseline; gap: 6px; border: 1px solid var(--accent); background: rgba(209,176,107,0.08); color: var(--accent); padding: 10px 14px; border-radius: 999px; font-weight: 600; letter-spacing: 0.02em; }
+        .catalog-modal__actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .catalog-modal__actions .c-card__button { margin: 0; }
+
+        @media (max-width: 900px) {
+            .catalog-modal { grid-template-columns: 1fr; }
+        }
+
+		/* Header menu link active style for catalog */
+		.menu__list .menu__link[href="catalog.html"] { color: var(--accent); }
+        @media (max-width: 768px){ .c-advanced { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); } }
+        @media (max-width: 480px){ .c-grid { grid-template-columns: 1fr; gap: 16px; } }
+	</style>
+</head>
+
+<body>
+	<div class="preloader" data-preloader>
+		<div class="preloader__inner">
+			<div class="preloader__logo">Attorney Law</div>
+			<div class="preloader__spinner" role="presentation"></div>
+			<div class="preloader__progress" aria-hidden="true">
+				<span class="preloader__bar"></span>
+				<span class="preloader__bar"></span>
+				<span class="preloader__bar"></span>
+				<span class="preloader__bar"></span>
+			</div>
+			<p class="preloader__text" role="status" aria-live="polite">Preparing your experience</p>
+		</div>
+	</div>
+	<div class="wrapper">
+		<header class="header">
+			<div class="header__container">
+                <div class="heder">
+                    <a href="index.html" class="header__logo"><img src="img/logo.svg" alt="logo"></a>
+                    <button class="menu-toggle" type="button" data-nav-toggle aria-expanded="false"
+                        aria-controls="primary-navigation" aria-label="Toggle navigation">
+                        <span class="menu-toggle__icon"></span>
+                    </button>
+				</div>
+				<div class="foote">
+					<div class="header__menu menu">
+						<nav class="menu__body" id="primary-navigation" data-nav-menu>
+							<ul class="menu__list">
+								<li class="menu__item"><a href="index.html#hero" class="menu__link" data-scroll-target="hero">Home</a></li>
+								<li class="menu__item"><a href="index.html#about" class="menu__link" data-scroll-target="about">About Us</a></li>
+								<li class="menu__item"><a href="index.html#media-gallery" class="menu__link" data-scroll-target="media-gallery">Pages</a></li>
+								<li class="menu__item"><a href="index.html#contact-map" class="menu__link" data-scroll-target="contact-map">Contact Us</a></li>
+								<li class="menu__item"><a href="catalog.html" class="menu__link" style="color: var(--accent);">Catalog</a></li>
+								<li class="menu__item"><a href="favorites.html" class="menu__link">Favorites</a></li>
+								<li class="menu__item"><a href="feedback.html" class="menu__link">Feedback</a></li>
+								<li class="menu__item"><a href="cart.html" class="menu__link">Cart</a></li>
+								<li class="menu__item"><a href="auth.html" class="menu__link">Sign in</a></li>
+								<li class="menu__item" data-admin-only hidden><a href="admin.html" class="menu__link">Admin</a></li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+		</header>
+		<div class="menu-overlay" data-nav-overlay hidden aria-hidden="true"></div>
+		<main class="page">
+            <div class="block3">
+				<div class="block3__container">
+					<div class="block3__left">
+						<div class="block3__left-titl">
+                            <h2>Products and Services Catalog</h2>
+						</div>
+						<div class="block3__left-decor">
+							<img src="img/block1/decor.svg" alt="decor">
+						</div>
+					</div>
+					<div class="block3__right">
+                        <p>Full list of our studio offerings.</p>
+					</div>
+				</div>
+			</div>
+			<!-- Catalog filters and service list -->
+            <div class="block4">
+                <div class="block4__container">
+                    <div id="c-status" class="c-status">Loading catalog...</div>
+                    <div class="c-search">
+                        <input id="c-search" class="c-input" type="text" placeholder="Search by service name, keyword, or format" autocomplete="off">
+                    </div>
+                    <div class="c-sort">
+                        <select id="c-sort" class="c-select">
+                            <option value="none">Sort by: Default order</option>
+                            <option value="priceAsc">Price: Low to High</option>
+                            <option value="priceDesc">Price: High to Low</option>
+                            <option value="titleAsc">Title A-Z</option>
+                            <option value="titleDesc">Title Z-A</option>
+                            <option value="ratingDesc">Rating: High to Low</option>
+                            <option value="ratingAsc">Rating: Low to High</option>
+                            <option value="durationAsc">Duration: Shortest First</option>
+                            <option value="durationDesc">Duration: Longest First</option>
+                        </select>
+                    </div>
+                    <form id="c-advanced" class="c-advanced">
+                        <div class="c-field">
+                            <label for="price-min">Price from</label>
+                            <input id="price-min" type="number" min="0" step="10" placeholder="e.g., 150">
+                        </div>
+                        <div class="c-field">
+                            <label for="price-max">Price to</label>
+                            <input id="price-max" type="number" min="0" step="10" placeholder="e.g., 350">
+                        </div>
+                        <div class="c-field">
+                            <label for="rating-min">Rating from</label>
+                            <input id="rating-min" type="number" min="0" max="5" step="0.1" placeholder="4.5">
+                        </div>
+                        <div class="c-field">
+                            <label for="rating-max">Rating to</label>
+                            <input id="rating-max" type="number" min="0" max="5" step="0.1" placeholder="5.0">
+                        </div>
+                        <div class="c-field">
+                            <label for="duration-min">Session length from, min</label>
+                            <input id="duration-min" type="number" min="0" step="5" placeholder="e.g., 45">
+                        </div>
+                        <div class="c-field">
+                            <label for="duration-max">Session length to, min</label>
+                            <input id="duration-max" type="number" min="0" step="5" placeholder="e.g., 120">
+                        </div>
+                        <div class="c-field">
+                            <label for="format-select">Format</label>
+                            <select id="format-select" class="c-select">
+                                <option value="">Any</option>
+                                <option value="online">Online</option>
+                                <option value="in_person">In person</option>
+                                <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                        <div class="c-field">
+                            <label for="audience-input">Audience contains</label>
+                            <input id="audience-input" type="text" placeholder="e.g., SMB">
+                        </div>
+                        <div class="c-advanced__footer">
+                            <button type="submit" class="c-ctrl__btn c-ctrl__btn--accent">Apply filters</button>
+                            <button type="button" class="c-ctrl__btn" data-action="advanced-reset">Clear</button>
+                        </div>
+                    </form>
+                    <div id="c-cats" class="c-filters"></div>
+                    <div class="c-controls">
+                        <button class="c-ctrl__btn c-ctrl__btn--accent" data-action="reset">Reset everything</button>
+                        <button class="c-ctrl__btn" data-action="inStock">In stock only</button>
+                        <button class="c-ctrl__btn" data-action="topRated">Top rated (4.8+)</button>
+                        <button class="c-ctrl__btn" data-action="shortSessions">Sessions up to 60 min</button>
+                    </div>
+                    <div id="c-error" class="c-error" role="alert"></div>
+                    <div id="c-empty" class="c-empty">No services match your filters yet.</div>
+                    <div id="catalog-root" class="c-grid" aria-live="polite"></div>
+                    <nav id="c-pagination" class="c-pagination" aria-label="Catalog pagination"></nav>
+                </div>
+            </div>
+		</main>
+	</div>
+    <div class="modal" id="catalog-detail-modal" data-modal hidden>
+        <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="catalog-detail-title">
+            <div class="modal__header">
+                <h2 class="modal__title" id="catalog-detail-title">Service details</h2>
+                <button type="button" class="modal__close" data-modal-close aria-label="Close dialog">
+                    <span class="modal__close-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="modal__body">
+                <div class="catalog-modal">
+                    <div class="catalog-modal__media">
+                        <img src="" alt="" data-detail-image>
+                        <span class="catalog-modal__badge" data-detail-stock hidden></span>
+                    </div>
+                    <div class="catalog-modal__content">
+                        <div class="catalog-modal__header">
+                            <h3 class="catalog-modal__title" data-detail-title></h3>
+                            <div class="catalog-modal__chips" data-detail-chips></div>
+                        </div>
+                        <div class="catalog-modal__section">
+                            <p data-detail-short></p>
+                        </div>
+                        <div class="catalog-modal__section" data-detail-details-section>
+                            <strong>What we deliver</strong>
+                            <div class="catalog-modal__details" data-detail-details></div>
+                        </div>
+                        <div class="catalog-modal__actions">
+                            <span class="catalog-modal__price"><span data-detail-price></span></span>
+                            <button type="button" class="c-card__button" data-detail-favorite data-action="favorite">Add to favorites</button>
+                            <button type="button" class="c-card__button" data-detail-cart data-action="cart">Add to cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	<script src="js/preloader.js"></script>
+	<script src="js/app.min.js?_v=20230917120620"></script>
+    <script src="js/scroll.js"></script>
+    <script type="module" src="js/nav.js"></script>
+<script type="module" src="js/catalog.js"></script>
+    <div id="c-toast" class="c-toast" role="status" aria-live="polite"></div>
+    <footer class="footer">
+        <div class="footer__container">
+            <div class="footer-img">
+                <picture><source srcset="img/footer/logfoot.webp" type="image/webp"><img src="img/footer/logfoot.png" alt="img"></picture>
+            </div>
+            <div class="footer-body">
+                <div class="footer-body__col1">
+                    <div class="footer-col1__titl">
+                        <p>
+                            Quick Link
+                        </p>
+                    </div>
+                    <div class="footer-col1__nav">
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="index.html">Home</a></li>
+                            <li class="foot-item"><a href="index.html">About Us</a></li>
+                            <li class="foot-item"><a href="index.html">Pricing</a></li>
+                            <li class="foot-item"><a href="index.html">Testimonial</a></li>
+                            <li class="foot-item"><a href="index.html">Contact Us</a></li>
+                        </ul>
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="index.html">Blog</a></li>
+                            <li class="foot-item"><a href="index.html">Blog Single</a></li>
+                            <li class="foot-item"><a href="index.html">Cases</a></li>
+                            <li class="foot-item"><a href="index.html">Cases Single</a></li>
+                            <li class="foot-item"><a href="index.html">Practice Areas</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-body__col1">
+                    <div class="footer-col1__titl">
+                        <p>
+                            Utility Pages
+                        </p>
+                    </div>
+                    <div class="footer-col1__nav">
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="index.html">Style guide</a></li>
+                            <li class="foot-item"><a href="index.html">Licenses</a></li>
+                            <li class="foot-item"><a href="index.html">Protected</a></li>
+                            <li class="foot-item"><a href="index.html">Changelog</a></li>
+                            <li class="foot-item"><a href="index.html">Error Page</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-body__col1">
+                    <div class="footer-col1__titl">
+                        <p>
+                            Practice Area
+                        </p>
+                    </div>
+                    <div class="footer-col1__nav">
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="index.html">Business Law</a></li>
+                            <li class="foot-item"><a href="index.html">Construction Law</a></li>
+                            <li class="foot-item"><a href="index.html">Car Accident</a></li>
+                            <li class="foot-item"><a href="index.html">Criminal Law</a></li>
+                            <li class="foot-item"><a href="index.html">Family Law</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-body__col1">
+                    <div class="footer-col1__titl">
+                        <p>
+                            Contact Us
+                        </p>
+                    </div>
+                    <div class="footer-col1__nav">
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="#">Attorney Law Office, 121 King Street,</a></li>
+                            <li class="foot-item"><a href="#">Las Vegas 90027,USA.</a></li>
+                            <li class="foot-item"><a href="#"></a></li>
+                            <li class="foot-item"><a href="#">Phone: (011) 9876 54321</a></li>
+                            <li class="foot-item"><a href="#">Email: info@example.com</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-foot">
+                <div class="footer-foot__text">
+                    <p>
+                        Copyright © Attorney Law | Designed by
+                        <span>VictorFlow</span>
+                        - Powered by
+                        <span>Webflow.</span>
+                    </p>
+                </div>
+                <div class="footer-foot__icon">
+                    <div class="footer-icon__text"><p>Follow :</p></div>
+                    <div class="footer-icon">
+                        <img src="img/footer/fb.svg" alt="img">
+                        <img src="img/footer/tw.svg" alt="img">
+                        <img src="img/footer/in.svg" alt="img">
+                        <img src="img/footer/p.svg" alt="img">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
+
+
+
+
+
+
+

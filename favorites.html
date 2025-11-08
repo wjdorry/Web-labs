@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Favorites</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" type="image/svg+xml" href="favicon.svg">
+	<link rel="stylesheet" href="css/style.min.css?_v=20230917120620">
+	<link rel="stylesheet" href="css/preloader.css">
+	<link rel="stylesheet" href="css/nav.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#0f1720; --card:#1F2732; --text:#E5EAEE; --muted:#AEB7C2; --accent:#D1B06B; }
+        body { background: var(--bg); }
+        .page { margin-top: 250px; }
+        @media (max-width: 768px){ .page { margin-top: 80px; } }
+        @media (max-width: 480px){ .page { margin-top: 64px; } }
+        .fav-count { font-size: 0.7em; color: var(--accent); font-weight: 700; margin-left: 8px; padding: 4px 12px; border-radius: 20px; background: rgba(209,176,107,0.15); border: 1px solid var(--accent); }
+        .fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+        .fav-card { background: var(--card); border: 1px solid rgba(209,176,107,0.18); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+        .fav-card:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(0,0,0,0.35); border-color: rgba(209,176,107,0.35); }
+        .fav-card__banner { height: 190px; background: #0b121a; overflow: hidden; }
+        .fav-card__banner img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+        .fav-card:hover .fav-card__banner img { transform: scale(1.06); }
+        .fav-card__body { padding: 18px 20px; display: grid; gap: 10px; }
+        .fav-card__title { font-size: 18px; font-weight: 600; color: var(--text); }
+        .fav-card__meta { display: flex; flex-wrap: wrap; gap: 8px; }
+        .fav-chip { font-size: 12px; color: var(--text); border: 1px solid rgba(209,176,107,0.35); padding: 6px 10px; border-radius: 999px; background: rgba(31,39,50,0.6); }
+        .fav-card__desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+        .fav-card__footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid rgba(209,176,107,0.18); gap: 12px; flex-wrap: wrap; }
+        .fav-card__price { display: inline-flex; align-items: baseline; gap: 6px; border: 1px solid var(--accent); padding: 8px 12px; border-radius: 8px; background: rgba(209,176,107,0.08); color: var(--accent); font-weight: 600; }
+        .fav-card__price span { color: var(--text); font-weight: 700; font-size: 16px; }
+        .fav-card__actions { display: flex; gap: 10px; }
+        .fav-card__btn { font-size: 13px; color: var(--text); background: transparent; border: 1px solid rgba(209,176,107,0.45); padding: 8px 14px; border-radius: 999px; cursor: pointer; transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .2s ease; }
+        .fav-card__btn:hover { background: rgba(209,176,107,0.85); color: #1F2732; border-color: var(--accent); transform: translateY(-1px); }
+        .fav-card__btn:disabled { opacity: .5; cursor: default; transform: none; }
+        .fav-empty { color: var(--muted); font-size: 16px; padding: 20px 0; display: none; }
+        .fav-status { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+        .fav-controls { display: flex; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
+        .fav-controls__btn { font-size: 14px; color: var(--text); background: transparent; border: 1px solid rgba(209,176,107,0.45); padding: 8px 14px; border-radius: 999px; cursor: pointer; transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
+        .fav-controls__btn:hover { background: rgba(209,176,107,0.2); border-color: var(--accent); }
+        .fav-error { background: rgba(184,64,64,0.18); border: 1px solid rgba(184,64,64,0.35); color: #ffb6b6; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: none; }
+        .fav-toast { position: fixed; inset-inline-end: 32px; inset-block-end: 32px; background: rgba(31,39,50,0.95); color: var(--text); border: 1px solid rgba(209,176,107,0.4); padding: 14px 18px; border-radius: 10px; box-shadow: 0 18px 30px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transform: translateY(12px); transition: opacity .3s ease, transform .3s ease; max-width: 320px; }
+        .fav-toast.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .menu__list .menu__link[href="favorites.html"] { color: var(--accent); }
+        @media (max-width: 480px){ .fav-grid { grid-template-columns: 1fr; gap: 16px; } }
+    </style>
+</head>
+<body>
+	<div class="preloader" data-preloader>
+		<div class="preloader__inner">
+			<div class="preloader__logo">Attorney Law</div>
+			<div class="preloader__spinner" role="presentation"></div>
+			<div class="preloader__progress" aria-hidden="true">
+				<span class="preloader__bar"></span>
+				<span class="preloader__bar"></span>
+				<span class="preloader__bar"></span>
+				<span class="preloader__bar"></span>
+			</div>
+			<p class="preloader__text" role="status" aria-live="polite">Preparing your experience</p>
+		</div>
+	</div>
+<div class="wrapper">
+    <header class="header">
+        <div class="header__container">
+            <div class="heder">
+                <a href="index.html" class="header__logo"><img src="img/logo.svg" alt="logo"></a>
+                <button class="menu-toggle" type="button" data-nav-toggle aria-expanded="false"
+                    aria-controls="primary-navigation" aria-label="Toggle navigation">
+                    <span class="menu-toggle__icon"></span>
+                </button>
+            </div>
+            <div class="foote">
+                <div class="header__menu menu">
+                    <nav class="menu__body" id="primary-navigation" data-nav-menu>
+                        <ul class="menu__list">
+								<li class="menu__item"><a href="index.html#hero" class="menu__link" data-scroll-target="hero">Home</a></li>
+								<li class="menu__item"><a href="index.html#about" class="menu__link" data-scroll-target="about">About Us</a></li>
+								<li class="menu__item"><a href="index.html#media-gallery" class="menu__link" data-scroll-target="media-gallery">Pages</a></li>
+								<li class="menu__item"><a href="index.html#contact-map" class="menu__link" data-scroll-target="contact-map">Contact Us</a></li>
+                            <li class="menu__item"><a href="catalog.html" class="menu__link">Catalog</a></li>
+                            <li class="menu__item"><a href="favorites.html" class="menu__link" style="color: var(--accent);">Favorites</a></li>
+                            <li class="menu__item"><a href="feedback.html" class="menu__link">Feedback</a></li>
+                            <li class="menu__item"><a href="cart.html" class="menu__link">Cart</a></li>
+                            <li class="menu__item"><a href="auth.html" class="menu__link">Sign in</a></li>
+                            <li class="menu__item" data-admin-only hidden><a href="admin.html" class="menu__link">Admin</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="inform-heder">
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="menu-overlay" data-nav-overlay hidden aria-hidden="true"></div>
+    <main class="page">
+        <div class="block3">
+            <div class="block3__container">
+                <div class="block3__left">
+                    <div class="block3__left-titl">
+                        <h2>Favorites <span id="fav-count" class="fav-count">0</span></h2>
+                    </div>
+                    <div class="block3__left-decor">
+                        <img src="img/block1/decor.svg" alt="decor">
+                    </div>
+                </div>
+                <div class="block3__right">
+                    <p>Save the services you want to revisit and jump back to the catalog any time.</p>
+                </div>
+            </div>
+        </div>
+        <div class="block4">
+            <div class="block4__container">
+                <div id="fav-status" class="fav-status">Loading favorites...</div>
+                <div class="fav-controls">
+                    <button id="fav-refresh" class="fav-controls__btn" type="button">Refresh list</button>
+                    <a class="fav-controls__btn" href="catalog.html">Back to catalog</a>
+                </div>
+                <div id="fav-error" class="fav-error" role="alert"></div>
+                <div id="fav-empty" class="fav-empty">Your favorites list is empty. Browse the catalog to add services.</div>
+                <div id="fav-root" class="fav-grid" aria-live="polite"></div>
+            </div>
+        </div>
+    </main>
+</div>
+<footer class="footer">
+    <div class="footer__container">
+        <div class="footer-img">
+            <picture><source srcset="img/footer/logfoot.webp" type="image/webp"><img src="img/footer/logfoot.png" alt="img"></picture>
+        </div>
+        <div class="footer-body">
+            <div class="footer-body__col1">
+                <div class="footer-col1__titl">
+                    <p>
+                        Quick Link
+                    </p>
+                </div>
+                <div class="footer-col1__nav">
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="index.html">Home</a></li>
+                        <li class="foot-item"><a href="index.html">About Us</a></li>
+                        <li class="foot-item"><a href="index.html">Pricing</a></li>
+                        <li class="foot-item"><a href="index.html">Testimonial</a></li>
+                        <li class="foot-item"><a href="index.html">Contact Us</a></li>
+                    </ul>
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="index.html">Blog</a></li>
+                        <li class="foot-item"><a href="index.html">Blog Single</a></li>
+                        <li class="foot-item"><a href="index.html">Cases</a></li>
+                        <li class="foot-item"><a href="index.html">Cases Single</a></li>
+                        <li class="foot-item"><a href="index.html">Practice Areas</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-body__col1">
+                <div class="footer-col1__titl">
+                    <p>
+                        Utility Pages
+                    </p>
+                </div>
+                <div class="footer-col1__nav">
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="index.html">Style guide</a></li>
+                        <li class="foot-item"><a href="index.html">Licenses</a></li>
+                        <li class="foot-item"><a href="index.html">Protected</a></li>
+                        <li class="foot-item"><a href="index.html">Changelog</a></li>
+                        <li class="foot-item"><a href="index.html">Error Page</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-body__col1">
+                <div class="footer-col1__titl">
+                    <p>
+                        Practice Area
+                    </p>
+                </div>
+                <div class="footer-col1__nav">
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="index.html">Business Law</a></li>
+                        <li class="foot-item"><a href="index.html">Construction Law</a></li>
+                        <li class="foot-item"><a href="index.html">Car Accident</a></li>
+                        <li class="foot-item"><a href="index.html">Criminal Law</a></li>
+                        <li class="foot-item"><a href="index.html">Family Law</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-body__col1">
+                <div class="footer-col1__titl">
+                    <p>
+                        Contact Us
+                    </p>
+                </div>
+                <div class="footer-col1__nav">
+                    <ul class="foot-list">
+                        <li class="foot-item"><a href="#">Attorney Law Office, 121 King Street,</a></li>
+                        <li class="foot-item"><a href="#">Las Vegas 90027,USA.</a></li>
+                        <li class="foot-item"><a href="#"></a></li>
+                        <li class="foot-item"><a href="#">Phone: (011) 9876 54321</a></li>
+                        <li class="foot-item"><a href="#">Email: info@example.com</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-foot">
+            <div class="footer-foot__text">
+                <p>
+                                        Copyright (c) Attorney Law | Designed by
+                    <span>VictorFlow</span>
+                    - Powered by
+                    <span>Webflow.</span>
+                </p>
+            </div>
+            <div class="footer-foot__icon">
+                <div class="footer-icon__text"><p>Follow :</p></div>
+                <div class="footer-icon">
+                    <img src="img/footer/fb.svg" alt="img">
+                    <img src="img/footer/tw.svg" alt="img">
+                    <img src="img/footer/in.svg" alt="img">
+                    <img src="img/footer/p.svg" alt="img">
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<div id="fav-toast" class="fav-toast" role="status" aria-live="polite"></div>
+<script src="js/preloader.js"></script>
+<script type="module" src="js/nav.js"></script>
+<script type="module" src="js/favorites.js"></script>
+</body>
+</html>
+
+
+
+
