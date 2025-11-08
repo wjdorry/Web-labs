@@ -1,0 +1,701 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registration & Sign In</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.min.css?_v=20230917120620">
+    <link rel="stylesheet" href="css/preloader.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1720;
+            --card: #1F2732;
+            --card-alt: rgba(31, 39, 50, 0.85);
+            --text: #E5EAEE;
+            --muted: #AEB7C2;
+            --accent: #D1B06B;
+            --danger: #ff9b9b;
+            --success: #7dd88d;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .auth-page {
+            margin-top: 400px;
+            padding-bottom: 120px;
+        }
+
+        @media (max-width: 768px) {
+            .auth-page {
+                margin-top: 120px;
+                padding: 40px 0 80px;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .auth-page {
+                margin-top: 90px;
+                padding: 32px 0 64px;
+            }
+        }
+
+        .auth-container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            gap: 24px;
+        }
+
+        .auth-card {
+            background: var(--card);
+            border-radius: 24px;
+            border: 1px solid rgba(209, 176, 107, 0.22);
+            box-shadow: 0 22px 34px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            display: grid;
+        }
+
+        .auth-header {
+            padding: 28px 32px 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .auth-header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .auth-header p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 12px;
+            padding: 0 32px 24px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 14px 18px;
+            background: rgba(15, 23, 32, 0.65);
+            border-radius: 14px;
+            border: 1px solid transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all .25s ease;
+        }
+
+        .auth-tab:hover {
+            border-color: rgba(209, 176, 107, 0.45);
+            color: var(--accent);
+        }
+
+        .auth-tab.is-active {
+            background: var(--accent);
+            color: #1F2732;
+            border-color: var(--accent);
+            box-shadow: 0 12px 22px rgba(209, 176, 107, 0.25);
+        }
+
+        .auth-panels {
+            display: grid;
+        }
+
+        .auth-panel {
+            display: none;
+            padding: 0 32px 36px;
+        }
+
+        .auth-panel[aria-hidden="false"] {
+            display: block;
+        }
+
+        .auth-grid {
+            display: grid;
+            gap: 18px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (max-width: 720px) {
+            .auth-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nickname-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .nickname-row input {
+                min-width: 100%;
+            }
+            
+            .nickname-row button {
+                width: 100%;
+            }
+        }
+
+        .form-field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .form-field.required>label::after {
+            content: '*';
+            color: var(--accent);
+            margin-left: 6px;
+        }
+
+        .form-field label {
+            font-size: 14px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field button[data-role="secondary"] {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(209, 176, 107, 0.2);
+            background: rgba(15, 23, 32, 0.65);
+            color: var(--text);
+            padding: 12px 14px;
+            font-size: 15px;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .nickname-row button[data-role="secondary"] {
+            width: auto !important;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(209, 176, 107, 0.2);
+        }
+
+        .form-field input[readonly] {
+            opacity: 1;
+            cursor: default;
+            background: rgba(15, 23, 32, 0.75);
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .nickname-row input[readonly] {
+            background: rgba(15, 23, 32, 0.85);
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .form-field.invalid input,
+        .form-field.invalid select {
+            border-color: rgba(255, 100, 100, 0.65);
+            box-shadow: 0 0 0 3px rgba(255, 100, 100, 0.18);
+        }
+
+        .field-error {
+            font-size: 13px;
+            color: var(--danger);
+            min-height: 16px;
+        }
+
+        .password-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .password-options label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 14px;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .agreement-block {
+            display: grid;
+            gap: 10px;
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(15, 23, 32, 0.65);
+            border: 1px dashed rgba(209, 176, 107, 0.3);
+        }
+
+        .agreement-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .agreement-actions button {
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(209, 176, 107, 0.35);
+            background: rgba(15, 23, 32, 0.55);
+            color: var(--accent);
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+        .agreement-actions button:disabled {
+            opacity: .5;
+            cursor: default;
+        }
+
+        .agreement-actions button:not(:disabled):hover {
+            background: rgba(209, 176, 107, 0.18);
+        }
+
+        .auth-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #1F2732;
+            border: none;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(209, 176, 107, 0.28);
+        }
+
+        .btn-primary:disabled {
+            opacity: .6;
+            cursor: default;
+        }
+
+        .auth-note {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .auth-panel h2 {
+            font-size: 24px;
+            margin: 0 0 18px;
+            font-weight: 600;
+        }
+
+        .divider {
+            border: none;
+            height: 1px;
+            background: rgba(209, 176, 107, 0.15);
+            margin: 12px 0;
+        }
+
+        .nickname-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nickname-row button {
+            width: auto;
+            white-space: nowrap;
+            min-width: auto;
+            flex-shrink: 0;
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .nickname-row input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 14px;
+            font-size: 15px;
+        }
+
+        .auth-toast {
+            position: fixed;
+            inset-inline-end: 32px;
+            inset-block-end: 32px;
+            background: rgba(31, 39, 50, 0.92);
+            color: var(--text);
+            border: 1px solid rgba(209, 176, 107, 0.35);
+            padding: 14px 18px;
+            border-radius: 12px;
+            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.45);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(16px);
+            transition: opacity .3s ease, transform .3s ease;
+            max-width: 360px;
+            z-index: 200;
+        }
+
+        .auth-toast.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        dialog {
+            border: none;
+            border-radius: 16px;
+            padding: 0;
+            background: rgba(12, 18, 26, 0.96);
+            color: var(--text);
+            max-width: 640px;
+            width: 90vw;
+        }
+
+        dialog::backdrop {
+            background: rgba(7, 10, 15, 0.65);
+        }
+
+        .agreement-modal__header {
+            padding: 24px 28px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .agreement-modal__header h3 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .agreement-modal__body {
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 20px 28px;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+
+        .agreement-modal__footer {
+            padding: 16px 28px 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .link-muted {
+            color: var(--accent);
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .password-hint {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .login-extra {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .login-extra label {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .muted-link {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .muted-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="preloader" data-preloader>
+        <div class="preloader__inner">
+            <div class="preloader__logo">Attorney Law</div>
+            <div class="preloader__spinner" role="presentation"></div>
+            <div class="preloader__progress" aria-hidden="true">
+                <span class="preloader__bar"></span>
+                <span class="preloader__bar"></span>
+                <span class="preloader__bar"></span>
+                <span class="preloader__bar"></span>
+            </div>
+            <p class="preloader__text" role="status" aria-live="polite">Preparing your experience</p>
+        </div>
+    </div>
+    <div class="wrapper">
+        <header class="header">
+            <div class="header__container">
+                <div class="heder">
+                    <a href="index.html" class="header__logo"><img src="img/logo.svg" alt="logo"></a>
+                    <button class="menu-toggle" type="button" data-nav-toggle aria-expanded="false"
+                        aria-controls="primary-navigation" aria-label="Toggle navigation">
+                        <span class="menu-toggle__icon"></span>
+                    </button>
+                </div>
+                <div class="foote">
+                    <div class="header__menu menu">
+                        <nav class="menu__body" id="primary-navigation" data-nav-menu>
+                            <ul class="menu__list">
+                                <li class="menu__item"><a href="index.html#hero" class="menu__link" data-scroll-target="hero">Home</a></li>
+                                <li class="menu__item"><a href="index.html#about" class="menu__link" data-scroll-target="about">About Us</a></li>
+                                <li class="menu__item"><a href="index.html#media-gallery" class="menu__link" data-scroll-target="media-gallery">Pages</a></li>
+                                <li class="menu__item"><a href="index.html#contact-map" class="menu__link" data-scroll-target="contact-map">Contact Us</a></li>
+                                <li class="menu__item"><a href="catalog.html" class="menu__link">Catalog</a></li>
+                                <li class="menu__item"><a href="favorites.html" class="menu__link">Favorites</a></li>
+                                <li class="menu__item"><a href="feedback.html" class="menu__link">Feedback</a></li>
+                                <li class="menu__item"><a href="cart.html" class="menu__link">Cart</a></li>
+                                <li class="menu__item"><a href="auth.html" class="menu__link"
+                                        style="color: var(--accent);">Sign in</a></li>
+                                <li class="menu__item" data-admin-only hidden><a href="admin.html"
+                                        class="menu__link">Admin</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="inform-heder">
+
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="menu-overlay" data-nav-overlay hidden aria-hidden="true"></div>
+        <main class="auth-page">
+            <div class="auth-container">
+                <section class="auth-card" data-auth-root>
+                    <div class="auth-header">
+                        <h1>Account</h1>
+                        <p>Create an account to access orders, favorites, and reviews, or sign in to an existing one.
+                        </p>
+                    </div>
+                    <div class="auth-tabs" role="tablist">
+                        <button type="button" class="auth-tab is-active" role="tab" aria-selected="true"
+                            data-mode="register">Register</button>
+                        <button type="button" class="auth-tab" role="tab" aria-selected="false" data-mode="login">Sign
+                            In</button>
+                    </div>
+                    <div class="auth-panels">
+                        <section class="auth-panel" data-panel="register" aria-hidden="false">
+                            <h2>User Registration</h2>
+                            <form id="registration-form" novalidate>
+                                <div class="auth-grid">
+                                    <div class="form-field required">
+                                        <label for="reg-last-name">Last name</label>
+                                        <input type="text" id="reg-last-name" name="lastName" autocomplete="family-name"
+                                            required>
+                                        <p class="field-error" data-error-for="reg-last-name"></p>
+                                    </div>
+                                    <div class="form-field required">
+                                        <label for="reg-first-name">First name</label>
+                                        <input type="text" id="reg-first-name" name="firstName"
+                                            autocomplete="given-name" required>
+                                        <p class="field-error" data-error-for="reg-first-name"></p>
+                                    </div>
+                                    <div class="form-field">
+                                        <label for="reg-middle-name">Middle name</label>
+                                        <input type="text" id="reg-middle-name" name="middleName"
+                                            autocomplete="additional-name">
+                                        <p class="field-error" data-error-for="reg-middle-name"></p>
+                                    </div>
+                                    <div class="form-field required">
+                                        <label for="reg-phone">Phone (Republic of Belarus)</label>
+                                        <input type="tel" id="reg-phone" name="phone" autocomplete="tel"
+                                            placeholder="+375 XX XXX-XX-XX" required>
+                                        <p class="field-error" data-error-for="reg-phone"></p>
+                                    </div>
+                                    <div class="form-field required">
+                                        <label for="reg-email">Email</label>
+                                        <input type="email" id="reg-email" name="email" autocomplete="email"
+                                            inputmode="email" required>
+                                        <p class="field-error" data-error-for="reg-email"></p>
+                                    </div>
+                                    <div class="form-field required">
+                                        <label for="reg-dob">Date of birth</label>
+                                        <input type="date" id="reg-dob" name="dob" required>
+                                        <p class="field-error" data-error-for="reg-dob"></p>
+                                    </div>
+                                </div>
+
+                                <hr class="divider">
+
+                                <div class="form-field required">
+                                    <label>Choose how to set your password</label>
+                                    <div class="password-options" role="radiogroup">
+                                        <label><input type="radio" name="passwordMode" value="manual" checked> Enter
+                                            manually</label>
+                                        <label><input type="radio" name="passwordMode" value="auto"> Generate
+                                            automatically</label>
+                                    </div>
+                                    <p class="field-error" data-error-for="passwordMode"></p>
+                                </div>
+
+                                <div class="auth-grid" data-password-section="manual">
+                                    <div class="form-field required">
+                                        <label for="reg-password">Password</label>
+                                        <input type="password" id="reg-password" name="password"
+                                            autocomplete="new-password" minlength="8" maxlength="20">
+                                        <p class="field-error" data-error-for="reg-password"></p>
+                                        <p class="password-hint">8–20 characters, at least one uppercase, lowercase
+                                            letter, digit, and special character.</p>
+                                    </div>
+                                    <div class="form-field required">
+                                        <label for="reg-password-confirm">Confirm password</label>
+                                        <input type="password" id="reg-password-confirm" name="passwordConfirm"
+                                            autocomplete="new-password" minlength="8" maxlength="20">
+                                        <p class="field-error" data-error-for="reg-password-confirm"></p>
+                                    </div>
+                                </div>
+
+                                <div class="form-field" data-password-section="auto" hidden>
+                                    <label for="reg-password-auto">Generated password</label>
+                                    <div class="nickname-row">
+                                        <input type="text" id="reg-password-auto" name="passwordAuto" readonly>
+                                        <button type="button" data-role="secondary"
+                                            data-action="password-regenerate">Generate again</button>
+                                    </div>
+                                    <p class="password-hint">Save the password now or change it after signing in.</p>
+                                </div>
+
+                                <hr class="divider">
+
+                                <div class="form-field required">
+                                    <label for="reg-nickname">Nickname</label>
+                                    <div class="nickname-row">
+                                        <input type="text" id="reg-nickname" name="nickname" readonly>
+                                        <button type="button" data-role="secondary"
+                                            data-action="nickname-refresh">Refresh</button>
+                                    </div>
+                                    <p class="field-error" data-error-for="reg-nickname"></p>
+                                </div>
+                                <div class="form-field" id="nickname-manual-wrapper" hidden>
+                                    <label for="reg-nickname-manual">Enter a nickname manually</label>
+                                    <input type="text" id="reg-nickname-manual" name="nicknameManual" minlength="3"
+                                        maxlength="24" placeholder="For example: LexPro315">
+                                    <p class="field-error" data-error-for="reg-nickname-manual"></p>
+                                </div>
+
+                                <div class="agreement-block">
+                                    <p>To complete registration, please read the <span class="link-muted"
+                                            data-action="open-agreement">User Agreement</span> and confirm your consent.
+                                    </p>
+                                    <div class="agreement-actions">
+                                        <button type="button" data-action="open-agreement">Open agreement</button>
+                                        <label>
+                                            <input type="checkbox" id="reg-agreement" name="agreement" disabled>
+                                            I confirm I have read and accept the terms
+                                        </label>
+                                    </div>
+                                    <p class="field-error" data-error-for="reg-agreement"></p>
+                                </div>
+
+                                <div class="auth-actions">
+                                    <button type="submit" class="btn-primary" id="reg-submit" disabled>Sign Up</button>
+                                    <span class="auth-note">The button will become active after all required fields are
+                                        filled out correctly.</span>
+                                </div>
+                            </form>
+                        </section>
+                        <section class="auth-panel" data-panel="login" aria-hidden="true">
+                            <h2>Sign in to your account</h2>
+                            <form id="login-form" novalidate>
+                                <div class="form-field required">
+                                    <label for="login-email">Email</label>
+                                    <input type="email" id="login-email" name="email" autocomplete="email" required>
+                                    <p class="field-error" data-error-for="login-email"></p>
+                                </div>
+                                <div class="form-field required">
+                                    <label for="login-password">Password</label>
+                                    <input type="password" id="login-password" name="password"
+                                        autocomplete="current-password" required>
+                                    <p class="field-error" data-error-for="login-password"></p>
+                                </div>
+                                <div class="login-extra">
+                                    <label><input type="checkbox" id="login-remember"> Remember me</label>
+                                    <a class="muted-link" href="#!">Forgot password?</a>
+                                </div>
+                                <div class="auth-actions">
+                                    <button type="submit" class="btn-primary" id="login-submit">Sign In</button>
+                                    <span class="auth-note">Don't have an account? <a class="muted-link"
+                                            data-action="switch-register" href="#register">Create one</a></span>
+                                </div>
+                            </form>
+                        </section>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <dialog id="agreement-modal">
+        <div class="agreement-modal__header">
+            <h3>User Agreement</h3>
+            <button type="button" data-action="agreement-close" aria-label="Close agreement">✕</button>
+        </div>
+        <div class="agreement-modal__body" id="agreement-content">
+            <p><strong>1. General provisions.</strong> This agreement governs the use of the legal consulting service
+                hosted on the Attorney Law website. By continuing to use the site, the user confirms agreement with the
+                terms of this document.</p>
+            <p><strong>2. Registration and account.</strong> When registering, the user agrees to provide accurate
+                personal data. The user is responsible for keeping credentials secure and must promptly notify the
+                administration of any unauthorized access.</p>
+            <p><strong>3. Personal data processing.</strong> Personal data are processed in accordance with the
+                legislation of the Republic of Belarus. The administration uses the data solely to provide services,
+                maintain order history, and improve service quality.</p>
+            <p><strong>4. Rights and obligations of the parties.</strong> The user agrees to comply with applicable law,
+                respect the rights of other users and service staff. The administration has the right to suspend access
+                in case of rule violations.</p>
+            <p><strong>5. Payments and refunds.</strong> Services are paid for in accordance with current rates. If a
+                service cannot be provided, funds are refunded in the manner established by the public offer agreement.
+            </p>
+            <p><strong>6. Liability.</strong> The administration is not liable for losses arising from improper use of
+                the service or from transferring credentials to third parties.</p>
+            <p><strong>7. Final provisions.</strong> Issues not regulated by this agreement are resolved in accordance
+                with the legislation of the Republic of Belarus. The current version of the document is available on the
+                website.</p>
+            <p><em>Scroll to the end to enable the confirmation button.</em></p>
+        </div>
+        <div class="agreement-modal__footer">
+            <button type="button" data-action="agreement-close">Close</button>
+            <button type="button" data-action="agreement-mark-read" disabled>Mark as read</button>
+        </div>
+    </dialog>
+    <div id="auth-toast" class="auth-toast" role="status" aria-live="polite"></div>
+    <script src="js/preloader.js"></script>
+    <script type="module" src="js/nav.js"></script>
+    <script type="module" src="js/auth.js"></script>
+</body>
+
+</html>
+
