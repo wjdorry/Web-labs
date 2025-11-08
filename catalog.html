@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Catalog</title>
+	<meta charset="UTF-8">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/style.min.css?_v=20230917120620">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit&display=swap" rel="stylesheet">
+	<style>
+		/* Page-scoped styles for catalog grid */
+		:root { --bg:#0f1720; --card:#1F2732; --text:#E5EAEE; --muted:#AEB7C2; --accent:#D1B06B; }
+		body { background: var(--bg); }
+        /* Layout spacing to avoid header overlap */
+        .page { margin-top: 250px; }
+        @media (max-width: 768px){ .page { margin-top: 80px; } }
+        @media (max-width: 480px){ .page { margin-top: 64px; } }
+        /* Dedicated catalog styles (no reuse of existing card styles) */
+        .c-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+        .c-card { box-sizing: border-box; width: 100%; background: var(--card); border: 1px solid rgba(209,176,107,0.18); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; will-change: transform; }
+        .c-card:hover { transform: translateY(-6px); box-shadow: 0 14px 30px rgba(0,0,0,.35); border-color: rgba(209,176,107,0.35); }
+        .c-card__banner { width: 100%; height: 180px; background: #0b121a; overflow: hidden; }
+        .c-card__banner img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+        .c-card:hover .c-card__banner img { transform: scale(1.06); }
+        .c-card__body { padding: 18px 18px 12px; display: grid; gap: 8px; }
+        .c-card__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+        .c-chip { font-size: 12px; line-height: 1; color: var(--text); border: 1px solid rgba(209,176,107,0.45); padding: 6px 8px; border-radius: 999px; background: rgba(31,39,50,0.6); }
+        .c-chip--muted { opacity: .7; }
+        .c-card__title { color: var(--text); font-size: 18px; line-height: 1.35; font-weight: 600; }
+        .c-card__desc { color: var(--muted); font-size: 14px; line-height: 1.6; min-height: 44px; }
+        .c-card__footer { display: flex; align-items: center; justify-content: flex-end; padding: 12px 18px 18px; border-top: 1px solid rgba(209,176,107,0.18); gap: 12px; }
+        .c-card__thumb { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex: 0 0 auto; }
+        .c-card__price { display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--accent); color: var(--text); padding: 10px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; transition: background-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease; }
+        .c-card__price:hover { background: var(--accent); color: #1F2732; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(209,176,107,.35); }
+        .c-card__price:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .c-card__price a { color: var(--text); }
+        .c-card__price:hover a { color: #1F2732; }
+        /* Controls */
+        .c-controls { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 24px; }
+        .c-ctrl__btn { font-size: 14px; color: var(--text); background: transparent; border: 1px solid rgba(209,176,107,0.45); padding: 8px 12px; border-radius: 999px; cursor: pointer; transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
+        .c-ctrl__btn:hover { background: rgba(209,176,107,0.2); border-color: var(--accent); }
+        /* Search */
+        .c-search { margin: 6px 0 12px; }
+        .c-input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(209,176,107,0.35); background: #121a23; color: var(--text); }
+        /* Sort */
+        .c-sort { margin: 0 0 12px; }
+        .c-select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(209,176,107,0.35); background: #121a23; color: var(--text); }
+        /* Categories */
+        .c-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+        .c-cat { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(209,176,107,0.35); cursor: pointer; background: rgba(31,39,50,0.5); color: var(--text); }
+        .c-cat input { accent-color: var(--accent); }
+        /* Empty state */
+        .c-empty { color: var(--muted); font-size: 16px; padding: 16px 0; display: none; }
+        /* Type filter */
+        .c-type { margin: 0 0 12px; display: grid; grid-template-columns: 1fr; }
+        .c-type .c-select { width: 260px; }
+		/* Header menu link active style for catalog */
+		.menu__list .menu__link[href="catalog.html"] { color: var(--accent); }
+        @media (max-width: 480px){ .c-grid { grid-template-columns: 1fr; gap: 16px; } }
+	</style>
+</head>
+
+<body>
+	<div class="wrapper">
+		<header class="header">
+			<div class="header__container">
+                <div class="heder">
+                    <a href="index.html" class="header__logo"><img src="img/logo.svg" alt="logo"></a>
+                    <a class="buts" href="index.html">Book A Consultation</a>
+				</div>
+				<div class="foote">
+					<div class="header__menu menu">
+						<nav class="menu__body">
+							<ul class="menu__list">
+                                <li class="menu__item"><a href="index.html" class="menu__link">Home</a></li>
+                                <li class="menu__item"><a href="index.html" class="menu__link">About Us</a></li>
+                                <li class="menu__item"><a href="index.html" class="menu__link">Pages</a></li>
+                                <li class="menu__item"><a href="index.html" class="menu__link">Contact Us</a></li>
+                                <li class="menu__item"><a href="catalog.html" class="menu__link">Catalog</a></li>
+							</ul>
+						</nav>
+					</div>
+					<div class="inform-heder">
+						<div class="call">
+							<div class="call-img">
+								<a href="tel:911-987654321"><img src="img/block1/call.svg" alt="">
+								</a>
+							</div>
+							<div class="ff">
+                                <div class="call-text1">
+                                    <span>Call Us On:</span>
+								</div>
+								<div class="call-text2">
+									<span>911-987654321</span>
+								</div>
+							</div>
+
+						</div>
+						<div class="email">
+							<div class="email-img">
+								<a href="mailto:yourmail@mail.com"><img src="img/block1/email.svg" alt="">
+								</a>
+							</div>
+							<div class="ff">
+                                <div class="email-text1">
+                                    <span>Email Us On:</span>
+								</div>
+								<div class="email-text2">
+									<span>yourmail@mail.com</span>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<main class="page">
+            <div class="block3">
+				<div class="block3__container">
+					<div class="block3__left">
+						<div class="block3__left-titl">
+                            <h2>Products and Services Catalog</h2>
+						</div>
+						<div class="block3__left-decor">
+							<img src="img/block1/decor.svg" alt="decor">
+						</div>
+					</div>
+					<div class="block3__right">
+                        <p>Full list of our studio offerings.</p>
+					</div>
+				</div>
+			</div>
+			<!-- Пустой контейнер для карточек каталога -->
+            <div class="block4">
+                <div class="block4__container">
+                    <div class="c-search">
+                        <input id="c-search" class="c-input" type="text" placeholder="Search by name or description...">
+                    </div>
+                    <div class="c-sort">
+                        <select id="c-sort" class="c-select">
+                            <option value="none">Sort: None</option>
+                            <option value="priceAsc">Price ↑</option>
+                            <option value="priceDesc">Price ↓</option>
+                            <option value="nameAsc">Name A→Z</option>
+                            <option value="nameDesc">Name Z→A</option>
+                            <option value="ratingDesc">Rating ↓</option>
+                            <option value="ratingAsc">Rating ↑</option>
+                        </select>
+                    </div>
+                    <div class="c-type">
+                        <select id="c-type" class="c-select">
+                            <option value="all">Type: All</option>
+                            <option value="service">Services only</option>
+                            <option value="product">Products only</option>
+                        </select>
+                    </div>
+                    <div id="c-cats" class="c-filters"></div>
+                    <div class="c-controls">
+                        <button class="c-ctrl__btn" data-action="reset">Reset</button>
+                        <button class="c-ctrl__btn" data-action="inStock">In Stock</button>
+                        <button class="c-ctrl__btn" data-action="services">Services</button>
+                        <button class="c-ctrl__btn" data-action="rating47">Rating ≥ 4.7</button>
+                        <button class="c-ctrl__btn" data-action="affordable">Price ≤ 10000</button>
+                        <button class="c-ctrl__btn" data-action="priceAsc">Sort: Price ↑</button>
+                        <button class="c-ctrl__btn" data-action="ratingDesc">Sort: Rating ↓</button>
+                        <button class="c-ctrl__btn" data-action="nameAsc">Sort: Name A→Z</button>
+                        <button class="c-ctrl__btn" data-action="mapUpper">Map: Uppercase Names</button>
+                        <button class="c-ctrl__btn" data-action="topRated">Reduce: Top Rated</button>
+                    </div>
+                    <div id="c-empty" class="c-empty">No products match your criteria.</div>
+                    <div id="catalog-root" class="c-grid"></div>
+                </div>
+            </div>
+		</main>
+	</div>
+	<script src="js/app.min.js?_v=20230917120620"></script>
+	<script>
+    (function() {
+        if (!Array.isArray(window.catalog)) return;
+        var root = document.getElementById('catalog-root');
+        if (!root) return;
+
+        function createCard(item){
+            var card = document.createElement('div');
+            card.className = 'c-card';
+
+            var banner = document.createElement('div');
+            banner.className = 'c-card__banner';
+            var bannerImg = document.createElement('img');
+            bannerImg.src = item.image; bannerImg.alt = item.name; banner.appendChild(bannerImg);
+
+            var body = document.createElement('div');
+            body.className = 'c-card__body';
+            var title = document.createElement('div'); title.className = 'c-card__title'; title.textContent = item.name;
+            var desc = document.createElement('div'); desc.className = 'c-card__desc'; desc.textContent = item.description;
+            var meta = document.createElement('div'); meta.className = 'c-card__meta';
+            var chipType = document.createElement('span'); chipType.className = 'c-chip'; chipType.textContent = (item.type || '').toString();
+            var chipRating = document.createElement('span'); chipRating.className = 'c-chip'; chipRating.textContent = '★ ' + (item.rating != null ? item.rating : '—');
+            var chipStock = document.createElement('span'); chipStock.className = 'c-chip ' + (item.inStock ? '' : 'c-chip--muted'); chipStock.textContent = item.inStock ? 'In stock' : 'Out of stock';
+            meta.appendChild(chipType); meta.appendChild(chipRating); meta.appendChild(chipStock);
+            body.appendChild(title); body.appendChild(desc); body.appendChild(meta);
+
+            var footer = document.createElement('div');
+            footer.className = 'c-card__footer';
+            var price = document.createElement('button'); price.className = 'c-card__price'; price.innerHTML = '<a href="#">'+ item.price +' ' + item.currency + '</a>';
+            footer.appendChild(price);
+
+            card.appendChild(banner); card.appendChild(body); card.appendChild(footer);
+            return card;
+        }
+
+        function render(list){
+            root.innerHTML = '';
+            var emptyEl = document.getElementById('c-empty');
+            if (emptyEl){ emptyEl.style.display = list && list.length ? 'none' : 'block'; }
+            var frag = document.createDocumentFragment();
+            for (var i = 0; i < list.length; i++) {
+                frag.appendChild(createCard(list[i]));
+            }
+            root.appendChild(frag);
+        }
+
+        var originalCatalog = window.catalog.slice();
+        var currentSearch = '';
+        var currentSort = 'none';
+        var selectedCats = new Set();
+        var currentType = 'all';
+        function applySearch(list){
+            if (!currentSearch) return list;
+            var q = currentSearch.toLowerCase();
+            return list.filter(function(x){
+                return (x.name||'').toLowerCase().indexOf(q)!==-1 || (x.description||'').toLowerCase().indexOf(q)!==-1;
+            });
+        }
+        function getCategory(item){
+            var n = ((item.category) ? item.category : (item.name || '')).toLowerCase();
+            function has(k){ return n.indexOf(k) !== -1; }
+            if (has('business') || has('franchise') || has('securities') || has('startup')) return 'Corporate';
+            if (has('construction')) return 'Construction';
+            if (has('car') || has('wrongful') || has('medical')) return 'Injury & Torts';
+            if (has('criminal')) return 'Criminal';
+            if (has('family')) return 'Family';
+            if (has('real estate')) return 'Real Estate';
+            if (has('employment')) return 'Employment';
+            if (has('insurance')) return 'Insurance';
+            if (has('intellectual') || has('patent') || has('trademark') || has('copyright')) return 'Intellectual Property';
+            if (has('immigration')) return 'Immigration';
+            if (has('tax')) return 'Tax';
+            if (has('estate')) return 'Estate';
+            if (has('contract') || has('legal') || has('gdpr') || has('compliance')) return 'Contracts & Compliance';
+            if (has('bankruptcy')) return 'Bankruptcy';
+            if (has('environment')) return 'Environmental';
+            if (has('arbitration') || has('mediation')) return 'Dispute Resolution';
+            if (has('maritime')) return 'Maritime';
+            if (has('cybersecurity') || has('privacy')) return 'Privacy & Cybersecurity';
+            if (has('nonprofit')) return 'Nonprofit';
+            return 'Other';
+        }
+        function applyCategories(list){
+            if (!selectedCats || selectedCats.size === 0) return list;
+            return list.filter(function(x){ return selectedCats.has(getCategory(x)); });
+        }
+        function applyType(list){
+            if (currentType === 'all') return list;
+            var t = currentType;
+            return list.filter(function(x){ return (x.type||'').toLowerCase() === t; });
+        }
+        function applySort(list){
+            switch(currentSort){
+                case 'priceAsc': return list.slice().sort(function(a,b){return (a.price||0)-(b.price||0)});
+                case 'priceDesc': return list.slice().sort(function(a,b){return (b.price||0)-(a.price||0)});
+                case 'nameAsc': return list.slice().sort(function(a,b){return (a.name||'').localeCompare(b.name||'')});
+                case 'nameDesc': return list.slice().sort(function(a,b){return (b.name||'').localeCompare(a.name||'')});
+                case 'ratingDesc': return list.slice().sort(function(a,b){return (b.rating||0)-(a.rating||0)});
+                case 'ratingAsc': return list.slice().sort(function(a,b){return (a.rating||0)-(b.rating||0)});
+                default: return list;
+            }
+        }
+        render(originalCatalog);
+
+        var controls = document.querySelector('.c-controls');
+        if (controls){
+            controls.addEventListener('click', function(e){
+                var btn = e.target.closest('button[data-action]');
+                if (!btn) return;
+                var action = btn.getAttribute('data-action');
+                var list = applySort(applySearch(applyCategories(applyType(originalCatalog.slice()))));
+                switch(action){
+                    case 'reset':
+                        currentSearch = '';
+                        var si = document.getElementById('c-search'); if (si) si.value = '';
+                        currentSort = 'none';
+                        var ss = document.getElementById('c-sort'); if (ss) ss.value = 'none';
+                        currentType = 'all';
+                        var ts = document.getElementById('c-type'); if (ts) ts.value = 'all';
+                        selectedCats.clear();
+                        var catsWrapReset = document.getElementById('c-cats');
+                        if (catsWrapReset){
+                            var inputs = catsWrapReset.querySelectorAll('input[type="checkbox"][data-cat]');
+                            for (var k=0;k<inputs.length;k++){ inputs[k].checked = false; }
+                        }
+                        render(originalCatalog);
+                        return;
+                    case 'inStock':
+                        list = list.filter(function(x){ return !!x.inStock; });
+                        break;
+                    case 'services':
+                        list = list.filter(function(x){ return (x.type||'').toLowerCase() === 'service'; });
+                        break;
+                    case 'rating47':
+                        list = list.filter(function(x){ return (x.rating||0) >= 4.7; });
+                        break;
+                    case 'affordable':
+                        list = list.filter(function(x){ return (x.price||0) <= 10000; });
+                        break;
+                    case 'priceAsc':
+                        list = list.sort(function(a,b){ return (a.price||0) - (b.price||0); });
+                        break;
+                    case 'ratingDesc':
+                        list = list.sort(function(a,b){ return (b.rating||0) - (a.rating||0); });
+                        break;
+                    case 'nameAsc':
+                        list = list.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+                        break;
+                    case 'mapUpper':
+                        list = list.map(function(x){ var y = Object.assign({}, x); y.name = (y.name||'').toUpperCase(); return y; });
+                        break;
+                    case 'topRated':
+                        var top = list.reduce(function(best, x){ return (!best || (x.rating||0) > (best.rating||0)) ? x : best; }, null);
+                        list = top ? [top] : [];
+                        break;
+                    default:
+                        break;
+                }
+                render(list);
+            });
+        }
+
+        var searchInput = document.getElementById('c-search');
+        if (searchInput){
+            searchInput.addEventListener('input', function(){
+                currentSearch = searchInput.value || '';
+                render(applySort(applySearch(applyCategories(applyType(originalCatalog.slice())))));
+            });
+        }
+
+        var sortSelect = document.getElementById('c-sort');
+        if (sortSelect){
+            sortSelect.addEventListener('change', function(){
+                currentSort = sortSelect.value || 'none';
+                render(applySort(applySearch(applyCategories(applyType(originalCatalog.slice())))));
+            });
+        }
+
+        // Build categories from dataset
+        var catsWrap = document.getElementById('c-cats');
+        if (catsWrap){
+            var seen = Object.create(null);
+            for (var i=0;i<originalCatalog.length;i++){
+                var c = getCategory(originalCatalog[i]);
+                if (c && !seen[c]){ seen[c]=1; }
+            }
+            for (var key in seen){
+                var lbl = document.createElement('label'); lbl.className = 'c-cat';
+                var cb = document.createElement('input'); cb.type = 'checkbox'; cb.setAttribute('data-cat', key); cb.value = key;
+                var txt = document.createElement('span'); txt.textContent = key;
+                lbl.appendChild(cb); lbl.appendChild(txt); catsWrap.appendChild(lbl);
+            }
+            catsWrap.addEventListener('change', function(e){
+                var cbx = e.target.closest('input[type="checkbox"][data-cat]');
+                if (!cbx) return;
+                var cat = cbx.getAttribute('data-cat');
+                if (cbx.checked) selectedCats.add(cat); else selectedCats.delete(cat);
+                render(applySort(applySearch(applyCategories(applyType(originalCatalog.slice())))));
+            });
+        }
+
+        var typeSelect = document.getElementById('c-type');
+        if (typeSelect){
+            typeSelect.addEventListener('change', function(){
+                currentType = (typeSelect.value || 'all').toLowerCase();
+                render(applySort(applySearch(applyCategories(applyType(originalCatalog.slice())))));
+            });
+        }
+	})();
+	</script>
+    <footer class="footer">
+        <div class="footer__container">
+            <div class="footer-img">
+                <picture><source srcset="img/footer/logfoot.webp" type="image/webp"><img src="img/footer/logfoot.png" alt="img"></picture>
+            </div>
+            <div class="footer-body">
+                <div class="footer-body__col1">
+                    <div class="footer-col1__titl">
+                        <p>
+                            Quick Link
+                        </p>
+                    </div>
+                    <div class="footer-col1__nav">
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="index.html">Home</a></li>
+                            <li class="foot-item"><a href="index.html">About Us</a></li>
+                            <li class="foot-item"><a href="index.html">Pricing</a></li>
+                            <li class="foot-item"><a href="index.html">Testimonial</a></li>
+                            <li class="foot-item"><a href="index.html">Contact Us</a></li>
+                        </ul>
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="index.html">Blog</a></li>
+                            <li class="foot-item"><a href="index.html">Blog Single</a></li>
+                            <li class="foot-item"><a href="index.html">Cases</a></li>
+                            <li class="foot-item"><a href="index.html">Cases Single</a></li>
+                            <li class="foot-item"><a href="index.html">Practice Areas</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-body__col1">
+                    <div class="footer-col1__titl">
+                        <p>
+                            Utility Pages
+                        </p>
+                    </div>
+                    <div class="footer-col1__nav">
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="index.html">Style guide</a></li>
+                            <li class="foot-item"><a href="index.html">Licenses</a></li>
+                            <li class="foot-item"><a href="index.html">Protected</a></li>
+                            <li class="foot-item"><a href="index.html">Changelog</a></li>
+                            <li class="foot-item"><a href="index.html">Error Page</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-body__col1">
+                    <div class="footer-col1__titl">
+                        <p>
+                            Practice Area
+                        </p>
+                    </div>
+                    <div class="footer-col1__nav">
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="index.html">Business Law</a></li>
+                            <li class="foot-item"><a href="index.html">Construction Law</a></li>
+                            <li class="foot-item"><a href="index.html">Car Accident</a></li>
+                            <li class="foot-item"><a href="index.html">Criminal Law</a></li>
+                            <li class="foot-item"><a href="index.html">Family Law</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-body__col1">
+                    <div class="footer-col1__titl">
+                        <p>
+                            Contact Us
+                        </p>
+                    </div>
+                    <div class="footer-col1__nav">
+                        <ul class="foot-list">
+                            <li class="foot-item"><a href="#">Attorney Law Office, 121 King Street,</a></li>
+                            <li class="foot-item"><a href="#">Las Vegas 90027,USA.</a></li>
+                            <li class="foot-item"><a href="#"></a></li>
+                            <li class="foot-item"><a href="#">Phone: (011) 9876 54321</a></li>
+                            <li class="foot-item"><a href="#">Email: info@example.com</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-foot">
+                <div class="footer-foot__text">
+                    <p>
+                        Copyright © Attorney Law | Designed by
+                        <span>VictorFlow</span>
+                        - Powered by
+                        <span>Webflow.</span>
+                    </p>
+                </div>
+                <div class="footer-foot__icon">
+                    <div class="footer-icon__text"><p>Follow :</p></div>
+                    <div class="footer-icon">
+                        <img src="img/footer/fb.svg" alt="img">
+                        <img src="img/footer/tw.svg" alt="img">
+                        <img src="img/footer/in.svg" alt="img">
+                        <img src="img/footer/p.svg" alt="img">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
+
+
