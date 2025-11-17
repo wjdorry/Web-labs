@@ -101,6 +101,51 @@
 		.menu__list .menu__link[href="catalog.html"] { color: var(--accent); }
         @media (max-width: 768px){ .c-advanced { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); } }
         @media (max-width: 480px){ .c-grid { grid-template-columns: 1fr; gap: 16px; } }
+
+        /* Parallax showcase */
+        .parallax-showcase { margin: 120px 0 90px; color: var(--text); }
+        .parallax-showcase__container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .parallax-showcase__inner { position: relative; border-radius: 32px; overflow: hidden; min-height: 750px; background: radial-gradient(circle at 20% 20%, rgba(209,176,107,0.35), transparent 55%), radial-gradient(circle at 80% 10%, rgba(67,120,255,0.25), transparent 65%), #0a1119; box-shadow: 0 30px 80px rgba(0,0,0,0.45); isolation: isolate; }
+        .parallax-layer { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; will-change: transform; transition: transform .35s ease; }
+        .parallax-layer--bg { z-index: 1; }
+        .parallax-layer--middle { z-index: 2; padding: 40px; }
+        .parallax-layer--foreground { z-index: 3; padding: 60px 40px; }
+        .parallax-layer--reverse { z-index: 4; align-items: flex-start; justify-content: flex-end; padding: 40px; }
+        .parallax-showcase__halo { width: 120%; height: 120%; background: radial-gradient(circle, rgba(15,155,155,0.35), transparent 60%); filter: blur(10px); }
+        .parallax-pillars { display: flex; flex-wrap: wrap; gap: 18px; list-style: none; margin: 0; padding: 0; max-width: 960px; }
+        .parallax-pillars li { flex: 1 1 240px; min-height: 120px; border-radius: 18px; background: rgba(18,26,35,0.8); border: 1px solid rgba(209,176,107,0.2); padding: 18px; backdrop-filter: blur(12px); font-size: 16px; line-height: 1.5; display: flex; flex-direction: column; gap: 10px; }
+        .parallax-pillars strong { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(229,234,238,0.75); }
+        .parallax-card { pointer-events: auto; max-width: 520px; background: rgba(17,24,33,0.9); border-radius: 26px; padding: 36px; border: 1px solid rgba(209,176,107,0.25); box-shadow: 0 20px 45px rgba(0,0,0,0.45); display: grid; gap: 20px; }
+        .parallax-card__eyebrow { font-size: 0.85rem; letter-spacing: 0.3em; color: rgba(209,176,107,0.9); text-transform: uppercase; }
+        .parallax-card__title { font-size: clamp(2rem, 2.6vw, 2.8rem); margin: 0; }
+        .parallax-card__desc { font-size: 1.05rem; color: var(--muted); margin: 0; }
+        .parallax-card__actions { display: flex; flex-wrap: wrap; gap: 14px; }
+        .parallax-card__actions a { text-decoration: none; }
+        .parallax-card__cta { background: var(--accent); color: #111827; padding: 12px 22px; border-radius: 999px; font-weight: 600; letter-spacing: 0.05em; border: none; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .parallax-card__cta:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(0,0,0,0.35); }
+        .parallax-card__cta::after { content: "→"; font-size: 1.2em; }
+        .parallax-card__meta { display: flex; gap: 12px; color: rgba(229,234,238,0.75); font-size: 0.92rem; flex-wrap: wrap; }
+        .parallax-card__meta span { display: inline-flex; align-items: center; gap: 6px; }
+        .parallax-card__meta span::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+        .parallax-reverse { pointer-events: none; background: rgba(67,120,255,0.25); color: #bcd6ff; border: 1px solid rgba(67,120,255,0.4); padding: 14px 20px; border-radius: 999px; font-size: 0.95rem; letter-spacing: 0.12em; text-transform: uppercase; backdrop-filter: blur(8px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .parallax-reverse strong { font-size: 1rem; letter-spacing: 0.14em; }
+        .parallax-showcase__badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(209,176,107,0.15); border: 1px solid rgba(209,176,107,0.4); color: var(--accent); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.2em; }
+        @media (max-width: 900px) {
+            .parallax-showcase { margin: 80px 0; }
+            .parallax-showcase__inner { min-height: 460px; border-radius: 26px; }
+            .parallax-layer--foreground { padding: 48px 28px; }
+            .parallax-pillars li { flex-basis: calc(50% - 18px); }
+        }
+        @media (max-width: 640px) {
+            .parallax-showcase__inner { min-height: 420px; }
+            .parallax-pillars { gap: 12px; }
+            .parallax-pillars li { flex-basis: 100%; min-height: auto; }
+            .parallax-card { padding: 28px; }
+            .parallax-layer--reverse { justify-content: center; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .parallax-layer { transition: none; transform: none !important; }
+        }
 	</style>
 </head>
 
@@ -166,6 +211,55 @@
 				</div>
 			</div>
 			<!-- Catalog filters and service list -->
+            <section class="parallax-showcase" aria-label="Immersive view of catalog highlights">
+                <div class="parallax-showcase__container">
+                    <div class="parallax-showcase__inner" data-parallax>
+                        <div class="parallax-layer parallax-layer--bg" data-parallax-layer data-speed="0.15" aria-hidden="true">
+                            <div class="parallax-showcase__halo"></div>
+                        </div>
+                        <div class="parallax-layer parallax-layer--middle" data-parallax-layer data-speed="0.32" aria-hidden="true">
+                            <ul class="parallax-pillars">
+                                <li>
+                                    <strong>Strategy</strong>
+                                    Enterprise-grade discovery sprints with legal foresight built in.
+                                </li>
+                                <li>
+                                    <strong>Delivery</strong>
+                                    Cross-functional squads shipping compliant features twice as fast.
+                                </li>
+                                <li>
+                                    <strong>Care</strong>
+                                    White-glove success managers who proactively remove blockers.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="parallax-layer parallax-layer--foreground" data-parallax-layer data-speed="0.58">
+                            <div class="parallax-card">
+                                <span class="parallax-card__eyebrow">Immersive Preview</span>
+                                <h3 class="parallax-card__title">Scroll to feel the depth of our catalog</h3>
+                                <p class="parallax-card__desc">
+                                    Multi-layer parallax highlights how our services adapt at every tier—from foundational advisory to turnkey delivery pods.
+                                </p>
+                                <div class="parallax-card__meta">
+                                    <span>Live insights</span>
+                                    <span>Adaptive pricing</span>
+                                    <span>Global experts</span>
+                                </div>
+                                <div class="parallax-card__actions">
+                                    <a class="parallax-card__cta" href="#catalog-root">Explore catalog</a>
+                                    <div class="parallax-showcase__badge">New looks</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="parallax-layer parallax-layer--reverse" data-parallax-layer data-speed="-0.22" aria-hidden="true">
+                            <div class="parallax-reverse">
+                                <span>Trusted by</span>
+                                <strong>120+ teams</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
             <div class="block4">
                 <div class="block4__container">
                     <div id="c-status" class="c-status">Loading catalog...</div>
@@ -284,6 +378,78 @@
     <script src="js/scroll.js"></script>
     <script type="module" src="js/nav.js"></script>
 <script type="module" src="js/catalog.js"></script>
+<script>
+(function () {
+    const containers = document.querySelectorAll('[data-parallax]');
+    if (!containers.length) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const layersMap = new WeakMap();
+    let enabled = false;
+    let scheduled = false;
+
+    containers.forEach(container => {
+        layersMap.set(container, Array.from(container.querySelectorAll('[data-parallax-layer]')));
+    });
+
+    function applyTransforms() {
+        const scrollY = window.scrollY || window.pageYOffset;
+        containers.forEach(container => {
+            const rect = container.getBoundingClientRect();
+            const offsetTop = scrollY + rect.top;
+            const delta = scrollY - offsetTop;
+            const layers = layersMap.get(container);
+            layers.forEach(layer => {
+                const speed = parseFloat(layer.dataset.speed || '0');
+                const translateY = delta * speed;
+                layer.style.transform = `translate3d(0, ${translateY}px, 0)`;
+            });
+        });
+        scheduled = false;
+    }
+
+    function queueTransform() {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(applyTransforms);
+    }
+
+    function enableParallax() {
+        if (enabled || prefersReducedMotion.matches) return;
+        enabled = true;
+        window.addEventListener('scroll', queueTransform, { passive: true });
+        window.addEventListener('resize', queueTransform);
+        queueTransform();
+    }
+
+    function disableParallax() {
+        if (!enabled) return;
+        enabled = false;
+        window.removeEventListener('scroll', queueTransform);
+        window.removeEventListener('resize', queueTransform);
+        containers.forEach(container => {
+            const layers = layersMap.get(container);
+            layers.forEach(layer => {
+                layer.style.transform = '';
+            });
+        });
+    }
+
+    prefersReducedMotion.addEventListener('change', event => {
+        if (event.matches) {
+            disableParallax();
+        } else {
+            enableParallax();
+        }
+    });
+
+    if (prefersReducedMotion.matches) {
+        disableParallax();
+    } else {
+        enableParallax();
+    }
+})();
+</script>
     <div id="c-toast" class="c-toast" role="status" aria-live="polite"></div>
     <footer class="footer">
         <div class="footer__container">
