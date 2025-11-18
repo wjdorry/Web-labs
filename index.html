@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Галерея изображений Unsplash</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="header__title">Галерея изображений</h1>
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Поиск изображений..."
+                        autocomplete="off"
+                    >
+                    <button 
+                        type="button" 
+                        id="clearBtn" 
+                        class="clear-btn" 
+                        aria-label="Очистить поиск"
+                        style="display: none;"
+                    >×</button>
+                </div>
+                <select id="filterSelect" class="filter-select">
+                    <option value="">Все ориентации</option>
+                    <option value="landscape">Горизонтальные</option>
+                    <option value="portrait">Вертикальные</option>
+                    <option value="squarish">Квадратные</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Загрузка изображений...</p>
+            </div>
+            
+            <div id="errorMessage" class="error-message" style="display: none;">
+                <p>По вашему запросу ничего не найдено. Попробуйте другой поисковый запрос.</p>
+            </div>
+
+            <div id="gallery" class="gallery"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="footer__text">
+                <a href="https://github.com/wjdorry?tab=repositories" target="_blank" rel="noopener noreferrer" class="footer__link">GitHub</a>
+                <span class="footer__year">© <span id="currentYear"></span></span>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
